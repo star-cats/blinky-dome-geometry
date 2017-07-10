@@ -48,7 +48,7 @@ public class VertexLocations {
 
             ledOutWriter.write("index,sub_index,led_num," +
                                "points_up,layer," +
-                               "x,y,z" +
+                               "x,y,z," +
                                "triangle_center_x,triangle_center_y,triangle_center_z\n");
 
             double phi_high = PI/2 - atan(0.5);
@@ -161,12 +161,35 @@ public class VertexLocations {
     }
 
     private static void findLEDs(int index, int subIndex, Vector3D A, Vector3D B, Vector3D C) {
-        boolean up = pointsUp(A, B, C);
+        if (!isInPattern(index, subIndex)) {
+            return;
+        }
+        boolean up = pointsUp(index, subIndex);
         Vector3D center = A.add(B).add(C).scalarMultiply(1.0/3);
 
-        Vector3D offset1 = A.subtract(center).normalize().scalarMultiply(EDGE_LENGTH/1.732);
-        Vector3D offset2 = B.subtract(center).normalize().scalarMultiply(EDGE_LENGTH/1.732);
-        Vector3D offset3 = C.subtract(center).normalize().scalarMultiply(EDGE_LENGTH/1.732);
+        Vector3D primaryAxis;
+
+        if (up) {
+            if (A.getZ() < B.getZ() && A.getZ() < C.getZ()) {
+                primaryAxis = A;
+            } else if (B.getZ() < C.getZ()) {
+                primaryAxis = B;
+            } else {
+                primaryAxis = C;
+            }
+        } else {
+            if (A.getZ() > B.getZ() && A.getZ() > C.getZ()) {
+                primaryAxis = A;
+            } else if (B.getZ() > C.getZ()) {
+                primaryAxis = B;
+            } else {
+                primaryAxis = C;
+            }
+        }
+
+        Vector3D offset1 = primaryAxis.subtract(center).normalize().scalarMultiply(-EDGE_LENGTH/1.732);
+        Vector3D offset2 = rotateVector(offset1, center, 2 * PI / 3);
+        Vector3D offset3 = rotateVector(offset1, center, 4 * PI / 3);
 
         Vector3D vertex1 = center.add(offset1);
         Vector3D vertex2 = center.add(offset2);
@@ -176,6 +199,16 @@ public class VertexLocations {
         num_leds = writeLEDStrip(index, subIndex, vertex2, vertex3, num_leds, up, center);
         num_leds = writeLEDStrip(index, subIndex, vertex3, vertex1, num_leds, up, center);
 
+    }
+
+    private static boolean isInPattern(int index, int subIndex) {
+        if (index < 5 && subIndex == 15) {
+            return true;
+        }
+        return subIndex == 13
+                || subIndex == 9
+                || subIndex == 5
+                || subIndex == 1;
     }
 
     private static int getLayer(int index, int subIndex) {
@@ -219,26 +252,19 @@ public class VertexLocations {
         return Math.abs(A.getZ() - B.getZ()) < 0.1;
     }
 
-    private static boolean pointsUp(Vector3D A, Vector3D B, Vector3D C) {
-        if (matchZ(A, B)) {
-            if (C.getZ() > A.getZ()) {
-                return true;
-            }
-            return false;
+    private static boolean pointsUp(int index, int subIndex) {
+        boolean topUp =
+                subIndex == 2
+                        || subIndex == 4
+                        || subIndex == 6
+                        || subIndex == 9
+                        || subIndex == 11
+                        || subIndex == 14;
+        if (index < 10) {
+            return topUp;
+        } else {
+            return !topUp;
         }
-
-        if (matchZ(A, C)) {
-            if (B.getZ() > A.getZ()) {
-                return true;
-            }
-            return false;
-        }
-
-        // B.z == C.z
-        if (A.getZ() > B.getZ()) {
-            return true;
-        }
-        return false;
     }
 
     private static int writeLEDStrip(int index, int subIndex, Vector3D start, Vector3D end, int offset, boolean up, Vector3D triangleCenter) {
@@ -267,5 +293,31 @@ public class VertexLocations {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+    private static Vector3D rotateVector(Vector3D vec, Vector3D axis, double th) {
+        axis = axis.normalize();
+        double ux = axis.getX();
+        double uy = axis.getY();
+        double uz = axis.getZ();
+
+        double vx = vec.getX();
+        double vy = vec.getY();
+        double vz = vec.getZ();
+
+        double x = (cos(th) + ux * ux * (1 - cos(th))) * vx
+                + (ux * uy * (1 - cos(th)) - uz * sin(th)) * vy
+                + (ux * uz * (1 - cos(th)) + uy * sin(th)) * vz;
+
+        double y = (ux * uy * (1 - cos(th)) + uz * sin(th)) * vx
+                + (cos(th) + uy * uy * (1 - cos(th))) * vy
+                + (uy * uz * (1 - cos(th)) - ux * sin(th)) * vz;
+
+        double z = (ux * uz * (1 - cos(th)) - uy * sin(th)) * vx
+                + (uy * uz * (1 - cos(th)) + ux * sin(th)) * vy
+                + (cos(th) + uz * uz * (1 - cos(th))) * vz;
+
+        return new Vector3D(x, y, z);
     }
 }
