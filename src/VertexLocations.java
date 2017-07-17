@@ -49,7 +49,8 @@ public class VertexLocations {
             ledOutWriter.write("index,sub_index,led_num," +
                                "points_up,layer," +
                                "x,y,z," +
-                               "triangle_center_x,triangle_center_y,triangle_center_z\n");
+                               "triangle_center_x,triangle_center_y,triangle_center_z" +
+                               "pp_group,pp_strip,pp_index\n");
 
             double phi_high = PI/2 - atan(0.5);
             double phi_low = PI - phi_high;
@@ -275,7 +276,17 @@ public class VertexLocations {
         Vector3D norm = end.subtract(start).normalize();
 
         while (distance < strip_length) {
-            writeLED(index, subIndex, offset, start.add(norm.scalarMultiply(distance)), up, triangleCenter);
+            writeLED(
+                    index,
+                    subIndex,
+                    offset,
+                    start.add(norm.scalarMultiply(distance)),
+                    up,
+                    triangleCenter,
+                    getPPGroup(index, subIndex),
+                    getPPStrip(index, subIndex),
+                    getPPIndex(index, subIndex, offset)
+            );
             distance += LED_SPACING;
             offset++;
         }
@@ -283,15 +294,65 @@ public class VertexLocations {
         return offset;
     }
 
-    private static void writeLED(int index, int subIndex, int ledNumber, Vector3D position, boolean up, Vector3D triangleCenter) {
+    private static void writeLED(
+            int index,
+            int subIndex,
+            int ledNumber,
+            Vector3D position,
+            boolean up,
+            Vector3D triangleCenter,
+            int ppGroup,
+            int ppStrip,
+            int ppIndex
+    ) {
         int layer = getLayer(index, subIndex);
         try {
             ledOutWriter.write(String.format("%d,%d,%d,%d,%d", index, subIndex, ledNumber, up ? 1 : 0, layer));
             writeVector(ledOutWriter, position);
             writeVector(ledOutWriter, triangleCenter);
+            ledOutWriter.write(String.format("%d,%d,%d",ppGroup,ppStrip,ppIndex));
             ledOutWriter.write("\n");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static int getPPGroup (int triangleIndex, int triangleSubindex) {
+        if (triangleIndex < 2) {
+            if (triangleSubindex > 13) {
+                return 0;
+            }
+        }
+        return -1;
+    }
+
+    private static int getPPStrip (int triangleIndex, int triangleSubindex) {
+        if (triangleIndex < 2) {
+            if (triangleSubindex > 13) {
+                return 1;
+            }
+        }
+        return -1;
+    }
+
+    private static int getPPIndex (int triangleIndex, int triangleSubindex, int offset) {
+        switch (triangleIndex) {
+            case 0:
+                if (triangleSubindex == 15) {
+                    return offset;
+                } else if (triangleSubindex == 13){
+                    return offset + 105;
+                }
+                return -1;
+            case 1:
+                if (triangleSubindex == 15) {
+                    return offset + 105 * 2;
+                } else if (triangleSubindex == 13){
+                    return offset + 105 * 3;
+                }
+                return -1;
+            default:
+                return -1;
         }
     }
 
