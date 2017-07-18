@@ -49,8 +49,8 @@ public class VertexLocations {
             ledOutWriter.write("index,sub_index,led_num," +
                                "points_up,layer," +
                                "x,y,z," +
-                               "triangle_center_x,triangle_center_y,triangle_center_z" +
-                               "pp_group,pp_strip,pp_index\n");
+                               "triangle_center_x,triangle_center_y,triangle_center_z," +
+                               "pp_group,pp_strip,pp_index,\n");
 
             double phi_high = PI/2 - atan(0.5);
             double phi_low = PI - phi_high;
@@ -310,7 +310,7 @@ public class VertexLocations {
             ledOutWriter.write(String.format("%d,%d,%d,%d,%d", index, subIndex, ledNumber, up ? 1 : 0, layer));
             writeVector(ledOutWriter, position);
             writeVector(ledOutWriter, triangleCenter);
-            ledOutWriter.write(String.format("%d,%d,%d",ppGroup,ppStrip,ppIndex));
+            ledOutWriter.write(String.format(",%d,%d,%d",ppGroup,ppStrip,ppIndex));
             ledOutWriter.write("\n");
         } catch (IOException e) {
             e.printStackTrace();
