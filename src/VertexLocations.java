@@ -319,7 +319,7 @@ public class VertexLocations {
 
     private static int getPPGroup (int triangleIndex, int triangleSubindex) {
         if (triangleIndex < 2) {
-            if (triangleSubindex > 13) {
+            if (triangleSubindex >= 13) {
                 return 0;
             }
         }
@@ -328,7 +328,7 @@ public class VertexLocations {
 
     private static int getPPStrip (int triangleIndex, int triangleSubindex) {
         if (triangleIndex < 2) {
-            if (triangleSubindex > 13) {
+            if (triangleSubindex >= 13) {
                 return 1;
             }
         }
