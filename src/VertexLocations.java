@@ -20,6 +20,7 @@ public class VertexLocations {
 
     private static final double EDGE_LENGTH = 23.0;
     private static final double LED_SPACING = 100.0/2.54/60.0;
+    private static final int LEDS_PER_SIDE = 35; // I know this is a hack; fuck you
 
     public static void main(String[] args) {
         try {
@@ -272,10 +273,11 @@ public class VertexLocations {
         double distance = 0;
         double strip_length = start.distance(end);
 //        System.out.println(strip_length);
+        int strip_count = 0;
 
         Vector3D norm = end.subtract(start).normalize();
 
-        while (distance < strip_length) {
+        while (distance < strip_length && strip_count < LEDS_PER_SIDE) { // what did I say about fucking off?
             writeLED(
                     index,
                     subIndex,
@@ -289,6 +291,7 @@ public class VertexLocations {
             );
             distance += LED_SPACING;
             offset++;
+            strip_count++;
         }
 
         return offset;
