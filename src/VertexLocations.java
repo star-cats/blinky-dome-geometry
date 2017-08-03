@@ -2,17 +2,14 @@
  * Created by akesich on 5/20/17.
  */
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-
-import javax.xml.bind.ValidationException;
 
 import static java.lang.Math.*;
 
 public class VertexLocations {
-    private static BufferedWriter vertexOutWriter;
+    private static BufferedWriter domeVertexOutWriter;
+    private static BufferedWriter ledVertexOutWriter;
     private static BufferedWriter ledOutWriter;
     private static BufferedWriter starLedOutWriter;
     private static final int ITERATION = 4;
@@ -24,28 +21,43 @@ public class VertexLocations {
 
     public static void main(String[] args) {
         try {
-            File vertexOutFile = new File("vertex-locations.csv");
+            File domeVertexOutFile = new File("vertex-locations.csv");
             File ledOutFile = new File("led-locations.csv");
-            File starOutFile = new File("star-led-locations.csv");
-            if (!vertexOutFile.exists()) {
-                vertexOutFile.createNewFile();
+            File ledVertexOutFile = new File("led-vertex-locations.csv");
+            if (!domeVertexOutFile.exists()) {
+                domeVertexOutFile.createNewFile();
+            }
+
+            if (!ledVertexOutFile.exists()) {
+                ledVertexOutFile.createNewFile();
             }
 
             if (!ledOutFile.exists()) {
-                vertexOutFile.createNewFile();
+                ledOutFile.createNewFile();
             }
 
-            FileWriter vfw = new FileWriter(vertexOutFile.getAbsoluteFile());
-            vertexOutWriter = new BufferedWriter(vfw);
+            FileWriter dvfw = new FileWriter(domeVertexOutFile.getAbsoluteFile());
+            domeVertexOutWriter = new BufferedWriter(dvfw);
+
+            domeVertexOutWriter.write("index,sub_index");
+            domeVertexOutWriter.write(",vertex_1_x,vertex_1_y,vertex_1_z");
+            domeVertexOutWriter.write(",vertex_2_x,vertex_2_y,vertex_2_z");
+            domeVertexOutWriter.write(",vertex_3_x,vertex_3_y,vertex_3_z");
+            domeVertexOutWriter.write("\n");
+
+            FileWriter lvfw = new FileWriter(ledVertexOutFile.getAbsoluteFile());
+            ledVertexOutWriter = new BufferedWriter(lvfw);
+
+            ledVertexOutWriter.write("index,sub_index");
+            ledVertexOutWriter.write(",vertex_1_x,vertex_1_y,vertex_1_z");
+            ledVertexOutWriter.write(",vertex_2_x,vertex_2_y,vertex_2_z");
+            ledVertexOutWriter.write(",vertex_3_x,vertex_3_y,vertex_3_z");
+            ledVertexOutWriter.write(",pp_group,pp_strip,pp_led_index_offset");
+            ledVertexOutWriter.write("\n");
+
 
             FileWriter lfw = new FileWriter(ledOutFile.getAbsoluteFile());
             ledOutWriter = new BufferedWriter(lfw);
-
-            vertexOutWriter.write("index,sub_index");
-            vertexOutWriter.write(",vertex_1_x,vertex_1_y,vertex_1_z");
-            vertexOutWriter.write(",vertex_2_x,vertex_2_y,vertex_2_z");
-            vertexOutWriter.write(",vertex_3_x,vertex_3_y,vertex_3_z");
-            vertexOutWriter.write("\n");
 
             ledOutWriter.write("index,sub_index,led_num," +
                                "points_up,layer," +
@@ -88,7 +100,8 @@ public class VertexLocations {
                 subdivideTriangle(i + 15, vertex_1, vertex_2, vertex_3);
             }
 
-            vertexOutWriter.close();
+            domeVertexOutWriter.close();
+            ledVertexOutWriter.close();
             ledOutWriter.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -105,11 +118,11 @@ public class VertexLocations {
     private static void writeTriangle(int index, int subIndex, Vector3D A, Vector3D B, Vector3D C) {
         try {
             System.out.println(A.distance(B));
-            vertexOutWriter.write(String.format("%d,%d", index, subIndex));
-            writeVector(vertexOutWriter, A);
-            writeVector(vertexOutWriter, B);
-            writeVector(vertexOutWriter, C);
-            vertexOutWriter.write("\n");
+            domeVertexOutWriter.write(String.format("%d,%d", index, subIndex));
+            writeVector(domeVertexOutWriter, A);
+            writeVector(domeVertexOutWriter, B);
+            writeVector(domeVertexOutWriter, C);
+            domeVertexOutWriter.write("\n");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -197,6 +210,8 @@ public class VertexLocations {
         Vector3D vertex2 = center.add(offset2);
         Vector3D vertex3 = center.add(offset3);
 
+        writeLEDVertices(index, subIndex, vertex1, vertex2, vertex3);
+
         int num_leds = writeLEDStrip(index, subIndex, vertex1, vertex2, 0, up, center);
         num_leds = writeLEDStrip(index, subIndex, vertex2, vertex3, num_leds, up, center);
         num_leds = writeLEDStrip(index, subIndex, vertex3, vertex1, num_leds, up, center);
@@ -266,6 +281,23 @@ public class VertexLocations {
             return topUp;
         } else {
             return !topUp;
+        }
+    }
+
+    private static void writeLEDVertices(int index, int subIndex, Vector3D A, Vector3D B, Vector3D C) {
+        try {
+            ledVertexOutWriter.write(String.format("%d,%d", index, subIndex));
+            writeVector(ledVertexOutWriter, A);
+            writeVector(ledVertexOutWriter, B);
+            writeVector(ledVertexOutWriter, C);
+            ledVertexOutWriter.write(String.format(",%d", getPPGroup(index, subIndex)));
+            ledVertexOutWriter.write(String.format(",%d", getPPStrip(index, subIndex)));
+            ledVertexOutWriter.write(String.format(",%d", getPPIndex(index, subIndex, 0)));
+            ledVertexOutWriter.write("\n");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
