@@ -309,6 +309,10 @@ public class VertexLocations {
     }
 
     private static boolean isInPattern(int index, int subIndex) {
+        if (index == 10 && subIndex == 9) {
+            return false;
+        }
+
         if (index < 5 && subIndex == 15) {
             return true;
         }
@@ -443,42 +447,18 @@ public class VertexLocations {
     }
 
     private static int getPPGroup (int triangleIndex, int triangleSubindex) {
-        if (triangleIndex < 2) {
-            if (triangleSubindex >= 13) {
-                return 0;
-            }
-        }
-        return -1;
+        int key = triangleIndex * 100 + triangleSubindex;
+        return (int)groupMap.get(key);
     }
 
     private static int getPPStrip (int triangleIndex, int triangleSubindex) {
-        if (triangleIndex < 2) {
-            if (triangleSubindex >= 13) {
-                return 1;
-            }
-        }
-        return -1;
+        int key = triangleIndex * 100 + triangleSubindex;
+        return (int)stripMap.get(key);
     }
 
     private static int getPPIndex (int triangleIndex, int triangleSubindex, int offset) {
-        switch (triangleIndex) {
-            case 0:
-                if (triangleSubindex == 15) {
-                    return offset;
-                } else if (triangleSubindex == 13){
-                    return offset + 105;
-                }
-                return -1;
-            case 1:
-                if (triangleSubindex == 15) {
-                    return offset + 105 * 2;
-                } else if (triangleSubindex == 13){
-                    return offset + 105 * 3;
-                }
-                return -1;
-            default:
-                return -1;
-        }
+        int key = triangleIndex * 100 + triangleSubindex;
+        return (int)indexMap.get(key) * 3 * LEDS_PER_SIDE + offset;
     }
 
     // https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
