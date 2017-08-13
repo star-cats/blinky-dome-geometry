@@ -23,6 +23,7 @@ public class VertexLocations {
     private static HashMap stripMap;
     private static HashMap groupMap;
     private static HashMap indexMap;
+    private static HashMap orientatonMap;
 
 
     public static void main(String[] args) {
@@ -124,81 +125,83 @@ public class VertexLocations {
         groupMap = new HashMap();
         stripMap = new HashMap();
         indexMap = new HashMap();
+        orientatonMap = new HashMap();
 
         // PP 0, Strip 1
-        writePPMapping(3, 15, 0, 1, 0);
-        writePPMapping(3, 13, 0, 1, 1);
-        writePPMapping(4, 15, 0, 1, 2);
-        writePPMapping(4, 13, 0, 1, 3);
+        writePPMapping(3, 15, 0, 1, 0, "down");
+        writePPMapping(3, 13, 0, 1, 1, "up");
+        writePPMapping(4, 15, 0, 1, 2, "down");
+        writePPMapping(4, 13, 0, 1, 3, "up");
 
         // PP 0, Strip 2
-        writePPMapping( 3, 9, 0, 2, 0);
-        writePPMapping( 3, 1, 0, 2, 1);
-        writePPMapping( 4, 5, 0, 2, 2);
-        writePPMapping(14, 1, 0, 2, 3);
+        writePPMapping( 3, 9, 0, 2, 0, "down");
+        writePPMapping( 3, 1, 0, 2, 1, "up");
+        writePPMapping( 4, 5, 0, 2, 2, "left");
+        writePPMapping(14, 1, 0, 2, 3, "right");
 
         // PP 0, Strip 3
-        writePPMapping( 3,  5, 0, 3, 0);
-        writePPMapping(13,  9, 0, 3, 1);
-        writePPMapping(13,  5, 0, 3, 2);
-        writePPMapping( 9, 13, 0, 3, 3);
+        writePPMapping( 3,  5, 0, 3, 0, "left");
+        writePPMapping(13,  9, 0, 3, 1, "up");
+        writePPMapping(13,  5, 0, 3, 2, "down");
+        writePPMapping( 9, 13, 0, 3, 3, "up");
 
         // PP 0, Strip 4
-        writePPMapping( 2,  1, 0, 4, 0);
-        writePPMapping(12,  5, 0, 4, 1);
-        writePPMapping( 8, 13, 0, 4, 2);
-        writePPMapping(13,  1, 0, 4, 3);
+        writePPMapping( 2,  1, 0, 4, 0, "right");
+        writePPMapping(12,  5, 0, 4, 1, "right");
+        writePPMapping( 8, 13, 0, 4, 2, "up");
+        writePPMapping(13,  1, 0, 4, 3, "left");
 
         // PP 0, Strip 5
-        writePPMapping( 2,  5, 0, 5, 0);
-        writePPMapping(12,  1, 0, 5, 1);
-        writePPMapping(12,  9, 0, 5, 2);
+        writePPMapping( 2,  5, 0, 5, 0, "right");
+        writePPMapping(12,  1, 0, 5, 1, "right");
+        writePPMapping(12,  9, 0, 5, 2, "up");
 
         // PP 0, Strip 6
-        writePPMapping( 2,  9, 0, 6, 0);
-        writePPMapping( 1,  1, 0, 6, 1);
-        writePPMapping(11,  5, 0, 6, 2);
-        writePPMapping( 7, 13, 0, 6, 3);
+        writePPMapping( 2,  9, 0, 6, 0, "down");
+        writePPMapping( 1,  1, 0, 6, 1, "right");
+        writePPMapping(11,  5, 0, 6, 2, "right");
+        writePPMapping( 7, 13, 0, 6, 3, "up");
 
         // PP 0, Strip 7
-        writePPMapping(2, 15, 0, 7, 0);
-        writePPMapping(2, 13, 0, 7, 1);
-        writePPMapping(1, 15, 0, 7, 2);
-        writePPMapping(1, 13, 0, 7, 3);
+        writePPMapping(2, 15, 0, 7, 0, "down");
+        writePPMapping(2, 13, 0, 7, 1, "up");
+        writePPMapping(1, 15, 0, 7, 2, "down");
+        writePPMapping(1, 13, 0, 7, 3, "up");
 
         // PP 1, Strip 1
-        writePPMapping(0, 9, 1, 1, 0);
-        writePPMapping(0, 13, 1, 1, 1);
-        writePPMapping(0, 15, 1, 1, 2);
+        writePPMapping(0, 9, 1, 1, 0, "right");
+        writePPMapping(0, 13, 1, 1, 1, "up");
+        writePPMapping(0, 15, 1, 1, 2, "down");
 
         // PP 1, Strip 2
-        writePPMapping(0, 1, 1, 2, 0);
-        writePPMapping(1, 5, 1, 2, 1);
-        writePPMapping(1, 9, 1, 2, 2);
+        writePPMapping(0, 1, 1, 2, 0, "right");
+        writePPMapping(1, 5, 1, 2, 1, "up");
+        writePPMapping(1, 9, 1, 2, 2, "down");
 
         // PP 1, Strip 3
-        writePPMapping(10, 5, 1, 3, 0);
-        writePPMapping(6, 13, 1, 3, 1);
-        writePPMapping(11, 1, 1, 3, 2);
-        writePPMapping(11, 9, 1, 3, 3);
+        writePPMapping(10, 5, 1, 3, 0, "down");
+        writePPMapping(6, 13, 1, 3, 1, "up");
+        writePPMapping(11, 1, 1, 3, 2, "down");
+        writePPMapping(11, 9, 1, 3, 3, "up");
 
         // PP 1, Strip 4
-        writePPMapping(10, 1, 1, 3, 0);
-        writePPMapping(5, 13, 1, 3, 1);
-        writePPMapping(14, 5, 1, 3, 2);
-        writePPMapping(14, 9, 1, 3, 3);
+        writePPMapping(10, 1, 1, 3, 0, "down");
+        writePPMapping(5, 13, 1, 3, 1, "up");
+        writePPMapping(14, 5, 1, 3, 2, "down");
+        writePPMapping(14, 9, 1, 3, 3, "up");
 
         // PP 1, Strip 5
-        writePPMapping(0, 5, 1, 2, 0);
-        writePPMapping(4, 1, 1, 2, 1);
-        writePPMapping(4, 9, 1, 2, 2);
+        writePPMapping(0, 5, 1, 2, 0, "left");
+        writePPMapping(4, 1, 1, 2, 1, "up");
+        writePPMapping(4, 9, 1, 2, 2, "down");
     }
 
-    private static void writePPMapping(int index, int subindex, int group, int strip, int triangleIndex) {
+    private static void writePPMapping(int index, int subindex, int group, int strip, int triangleIndex, String orientation) {
         int key = index * 100 + subindex;
         groupMap.put(key, group);
         stripMap.put(key, strip);
         indexMap.put(key, triangleIndex);
+        orientatonMap.put(key, orientation);
     }
 
     private static Vector3D sphericalVector(double r, double theta, double phi) {
