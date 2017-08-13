@@ -382,11 +382,16 @@ public class VertexLocations {
     }
 
     private static void writeLEDVertices(int index, int subIndex, Vector3D A, Vector3D B, Vector3D C) {
+        Vector3D vertex1 = findFirstVertex(index, subIndex, A, B, C);
+        Vector3D center = A.add(B).add(C).scalarMultiply(1.0/3);
+        Vector3D vertex2 = rotateVector(vertex1, center, 2 * PI / 3);
+        Vector3D vertex3 = rotateVector(vertex1, center, 4 * PI / 3);
+
         try {
             ledVertexOutWriter.write(String.format("%d,%d", index, subIndex));
-            writeVector(ledVertexOutWriter, A);
-            writeVector(ledVertexOutWriter, B);
-            writeVector(ledVertexOutWriter, C);
+            writeVector(ledVertexOutWriter, vertex1);
+            writeVector(ledVertexOutWriter, vertex2);
+            writeVector(ledVertexOutWriter, vertex3);
             ledVertexOutWriter.write(String.format(",%d", getPPGroup(index, subIndex)));
             ledVertexOutWriter.write(String.format(",%d", getPPStrip(index, subIndex)));
             ledVertexOutWriter.write(String.format(",%d", getPPIndex(index, subIndex, 0)));
@@ -396,6 +401,49 @@ public class VertexLocations {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static Vector3D findFirstVertex(int index, int subIndex, Vector3D A, Vector3D B, Vector3D C) {
+        String orientation = (String)orientatonMap.get(index * 100 + subIndex);
+
+        if (orientation.equals("up")) {
+            if (A.getZ() > B.getZ() && A.getZ() > C.getZ()) {
+                return A;
+            } else if (B.getZ() > C.getZ()) {
+                return B;
+            }
+            return C;
+        }
+
+        if (orientation.equals("down")) {
+            if (A.getZ() < B.getZ() && A.getZ() < C.getZ()) {
+                return A;
+            } else if (B.getZ() < C.getZ()) {
+                return B;
+            }
+            return C;
+        }
+
+        double thetaA = Math.atan2(A.getY(), A.getX());
+        double thetaB = Math.atan2(B.getY(), B.getX());
+        double thetaC = Math.atan2(C.getY(), C.getX());
+
+        if (orientation.equals("left")) {
+            if (thetaA < thetaB && thetaA < thetaC) {
+                return A;
+            } else if (thetaB < thetaC) {
+                return B;
+            }
+            return C;
+        }
+
+        // orientation == "right"
+        if (thetaA > thetaB && thetaA > thetaC) {
+            return A;
+        } else if (thetaB > thetaC) {
+            return B;
+        }
+        return C;
     }
 
     private static int writeLEDStrip(int index, int subIndex, Vector3D start, Vector3D end, int offset, boolean up, Vector3D triangleCenter) {
